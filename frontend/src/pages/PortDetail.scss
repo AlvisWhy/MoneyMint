@@ -1,27 +1,132 @@
-.portDetailPage{
+.portDetailPage {
     box-sizing: border-box;
     padding: 20px;
     color: white;
     display: flex;
     flex-direction: column;
     height: 100vh;
+    background-color: #000000;
     h3 {
         font-weight: lighter;
     }
-    .portPart1{
-        margin-bottom: 20px;
+
+    .smlTitle {
+        font-size: 18px;
+        margin-bottom: 5px;
+        color: #ccc;
+        font-weight: bold;
     }
-    .portPart2{
+
+    .portPart1 {
         margin-bottom: 20px;
+        width: 100%;
+        margin-bottom: 0;
     }
-    .portPart3{
+
+    .portPart2 {
         margin-bottom: 20px;
+
+        .polyLine {
+            background-color: #000000;
+            padding: 10px;
+            border-radius: 8px;
+        }
+    }
+
+    .portPart3 {
+        margin-bottom: 20px;
+        width: 89%;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        align-items: start;
-    }
-    .portPart4{
+        align-items: flex-start;
 
+        .basicData {
+            width: 40vw;
+            padding: 10px 15px;
+            background-color: #000000;
+            border-radius: 8px;
+            .smlTitle{
+                margin-bottom: 50px;
+            }
+        }
+
+        .summary {
+            width: 40vw;
+            margin-left: 20px;
+            background-color: #000000;
+            border-radius: 8px;
+            padding: 10px 15px;
+
+            #summaryChart {
+                margin-top: 10px;
+                border-radius: 8px;
+            }
+        }
+    }
+}
+.stock-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    padding: 10px 0;
+
+    .stock-info {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        .ticker {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .company {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .price,
+        .volume {
+            font-size: 13px;
+            color: #ccc;
+        }
+    }
+
+    .stock-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .quantity-input {
+            width: 60px;
+            padding: 4px 6px;
+            background-color: #111;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+
+            &.buy {
+                background-color: #4caf50;
+                color: white;
+            }
+
+            &.sell {
+                background-color: #f44336;
+                color: white;
+            }
+        }
     }
 }

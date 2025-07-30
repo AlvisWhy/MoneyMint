@@ -1,8 +1,9 @@
 .stock-item {
     width: 100%;
     background-color: #111;
+    box-sizing: border-box;
     color: #fff;
-    padding: 1rem;
+    padding: 8px 16px;
     margin-bottom: 1rem;
     border-radius: 8px;
     font-family: Arial, sans-serif;
@@ -23,7 +24,7 @@
     }
 
     .stock-name {
-        width: 20%;
+        width: 16vw;
         strong {
             font-size: 1.1rem;
         }

@@ -85,7 +85,7 @@ const MainPage = () => {
 
                         <span className="price">Price</span>
                         <span className="change">Change</span>
-                        <span className="percent">percentage</span>
+                        <span className="percent">  Percentage</span>
                         <span className="open">Open</span>
                         <span className="high">High</span>
                         <span className="low">Low</span>

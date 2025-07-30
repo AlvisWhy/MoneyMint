@@ -38,14 +38,16 @@
 }
 .portfolios .portfoliosBody .part1 .button {
   border-radius: 5px;
-  padding: 4px;
+  padding: 4px 10px;
   border: #777777 1px solid;
   cursor: pointer;
   margin-top: 10px;
   margin-bottom: 20px;
+  background-color: #111;
+  color: #00aaff;
 }
 .portfolios .portfoliosBody .part1 .button:hover {
-  background-color: #3b3b3b;
+  background-color: #222;
   color: #fff;
 }
 .portfolios .portfoliosBody .part2 {
@@ -80,36 +82,103 @@
 }
 .portfolios .portfoliosBody .part3 .portTitle .leftTitle .myPortBtn {
   border-radius: 5px;
-  padding: 4px;
+  padding: 4px 10px;
   border: #777777 1px solid;
   cursor: pointer;
-  margin-bottom: 5px;
+  background-color: #111;
+  color: #00aaff;
+  margin-right: 10px;
 }
 .portfolios .portfoliosBody .part3 .portTitle .leftTitle .myPortBtn:hover {
   background-color: #00224b;
   color: #fff;
 }
 .portfolios .portfoliosBody .part3 .portBody {
+  margin-top: 10px;
   border: #777777 1px solid;
-  padding: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.portfolios .portfoliosBody .part3 .portBody .headerRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #444;
+}
+.portfolios .portfoliosBody .part3 .portBody .headerRow .headerName {
+  width: 30%;
+}
+.portfolios .portfoliosBody .part3 .portBody .headerRow h3 {
+  margin: 0;
+  color: #aaa;
+  font-weight: lighter;
+  text-align: left;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem {
+  border: 1px solid #333;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #111;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .portfolioHeader {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #111;
+  cursor: pointer;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .portfolioHeader h4 {
+  color: #00aaff;
+  margin: 0;
+  width: 33.33%;
+  text-align: left;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .portfolioHeader .rightele {
   display: flex;
   flex-direction: row;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .portfolioHeader .rightele .totalValue {
+  color: #fff;
+  width: 100px;
+  text-align: right;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .portfolioHeader .rightele .toggleBtn {
+  color: #aaa;
+  margin-left: 10px;
+  font-size: 14px;
+  text-align: center;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .stockList {
+  padding: 10px;
+  background-color: #1a1a1a;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .stockList .stockRow {
+  display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 15px;
+  padding: 5px 0;
+  border-bottom: 1px solid #333;
 }
-.portfolios .portfoliosBody .part3 .portBody .infopart {
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .stockList .stockRow .symbol {
+  width: 30%;
+  color: #ff4d4f;
+  font-weight: 500;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .stockList .stockRow .value {
+  width: 20%;
+  color: #fff;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.portfolios .portfoliosBody .part3 .portBody .portfolioItem .stockList .stockRow .sliderControl {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  width: 60%;
-}
-.portfolios .portfoliosBody .part3 .portBody .infopart .namepart {
-  width: 15%;
-}
-.portfolios .portfoliosBody .part3 .portBody .infopart .infopart {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
+  align-items: center;
 }
 
 /*# sourceMappingURL=portfolios.css.map */

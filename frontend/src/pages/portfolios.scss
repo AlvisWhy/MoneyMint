@@ -1,10 +1,11 @@
-.portfolios{
+.portfolios {
     box-sizing: border-box;
     padding: 20px;
     color: white;
     display: flex;
     flex-direction: column;
     height: 100vh;
+
     h3 {
         font-weight: lighter;
     }
@@ -17,7 +18,6 @@
 
         h3 {
             margin: 10px;
-
             &:hover {
                 cursor: pointer;
                 color: #d0d0d0;
@@ -31,25 +31,31 @@
         align-items: start;
         justify-content: start;
         width: 100%;
-        .part1{
+
+        .part1 {
             width: 100%;
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
+
             .button {
                 border-radius: 5px;
-                padding: 4px;
+                padding: 4px 10px;
                 border: #777777 1px solid;
                 cursor: pointer;
                 margin-top: 10px;
                 margin-bottom: 20px;
+                background-color: #111;
+                color: #00aaff;
+
                 &:hover {
-                    background-color: #3b3b3b;
+                    background-color: #222;
                     color: #fff;
                 }
             }
         }
+
         .part2 {
             width: 100%;
             border-radius: 5px;
@@ -67,54 +73,136 @@
             }
         }
 
-        .part3{
+        .part3 {
             width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            .portTitle{
+
+            .portTitle {
                 margin-top: 20px;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                .leftTitle{
+
+                .leftTitle {
                     display: flex;
-                    .myPortBtn{
+
+                    .myPortBtn {
                         border-radius: 5px;
-                        padding: 4px;
+                        padding: 4px 10px;
                         border: #777777 1px solid;
                         cursor: pointer;
+                        background-color: #111;
+                        color: #00aaff;
+                        margin-right: 10px;
+
                         &:hover {
                             background-color: #00224b;
                             color: #fff;
                         }
-                        margin-bottom: 5px;
                     }
                 }
             }
-            .portBody{
+
+            .portBody {
+                margin-top: 10px;
                 border: #777777 1px solid;
-                padding: 5px;
+                padding: 10px;
                 display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                .infopart{
+                flex-direction: column;
+                gap: 10px;
+
+                .headerRow {
                     display: flex;
                     justify-content: space-between;
-                    width: 100%;
-                    .namepart{
-                        width: 15%;
+                    padding: 10px;
+                    background-color: #1a1a1a;
+                    border-bottom: 1px solid #444;
+                    .headerName{
+                        width: 30%;
+
                     }
-                    .infopart{
+                    h3 {
+                        margin: 0;
+                        color: #aaa;
+                        font-weight: lighter;
+                        text-align: left;
+                    }
+                }
+
+                .portfolioItem {
+                    border: 1px solid #333;
+                    border-radius: 5px;
+                    overflow: hidden;
+                    background-color: #111;
+
+                    .portfolioHeader {
+                        padding: 10px;
                         display: flex;
                         justify-content: space-between;
-                        width: 100%;
-                    }
-                        width: 60%;
+                        align-items: center;
+                        background-color: #111;
+                        cursor: pointer;
+
+                        h4 {
+                            color: #00aaff;
+                            margin: 0;
+                            width: 33.33%;
+                            text-align: left;
+                        }
+                        .rightele{
+                            display: flex;
+                            flex-direction: row;
+                            .totalValue {
+                                color: #fff;
+                                width: 100px;
+                                text-align: right;
+                            }
+
+                            .toggleBtn {
+                                color: #aaa;
+                                margin-left: 10px;
+                                font-size: 14px;
+                                text-align: center;
+                            }
+                        }
+
                     }
 
+                    .stockList {
+                        padding: 10px;
+                        background-color: #1a1a1a;
 
+                        .stockRow {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            gap: 15px;
+                            padding: 5px 0;
+                            border-bottom: 1px solid #333;
+
+                            .symbol {
+                                width: 30%;
+                                color: #ff4d4f;
+                                font-weight: 500;
+                            }
+
+                            .value {
+                                width: 20%;
+                                color: #fff;
+                                text-align: right;
+                                font-variant-numeric: tabular-nums;
+                            }
+
+                            .sliderControl {
+                                flex: 1;
+                                display: flex;
+                                align-items: center;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
