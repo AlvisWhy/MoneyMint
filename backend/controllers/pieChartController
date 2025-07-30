@@ -1,0 +1,148 @@
+const axios = require('axios');
+const AppDataSource = require('../data-source');
+const PortfolioRepo = AppDataSource.getRepository('Portfolio');
+const UserRepo = AppDataSource.getRepository('User');
+
+async function fetchCurrentPrice(symbol) {
+  try {
+    const res = await axios.get('https://moneymint.onrender.com/current-price', {
+      params: { ticker: symbol }
+    });
+    return res.data.current_price;
+  } catch (err) {
+    console.error(`Error fetching price for ${symbol}:`, err.message);
+    return 0;
+  }
+}
+
+// exports.getPortfolioValuePie = async (req, res) => {
+//   const user_id = parseInt(req.params.user_id);
+
+//   try {
+//     // 获取用户及其所有组合
+//     const user = await UserRepo.findOne({ where: { user_id } });
+//     if (!user) return res.status(404).json({ message: 'User not found' });
+
+//     const portfolios = await PortfolioRepo.find({
+//       where: { user: { user_id } },
+//       relations: ['holdings'],
+//     });
+
+//     const pieData = [];
+
+//     for (const portfolio of portfolios) {
+//       let totalValue = 0;
+
+//       for (const holding of portfolio.holdings) {
+//         const price = await fetchCurrentPrice(holding.symbol);
+//         totalValue += holding.quantity * price;
+//       }
+
+//       pieData.push({
+//         portfolio_id: portfolio.portfolio_id,
+//         portfolio_name: portfolio.name,
+//         total_value: parseFloat(totalValue.toFixed(2))
+//       });
+//     }
+
+//     // 返回结果
+//     res.status(200).json({
+//       balance: parseFloat(user.balance),
+//       portfolios: pieData
+//     });
+//   } catch (err) {
+//     console.error('Pie chart data error:', err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
+// exports.getPortfolioStockValues = async (req, res) => {
+//   const portfolio_id = parseInt(req.params.portfolio_id);
+
+//   try {
+//     const portfolio = await PortfolioRepo.findOne({
+//       where: { portfolio_id },
+//       relations: ['holdings'],
+//     });
+
+//     if (!portfolio) {
+//       return res.status(404).json({ message: 'Portfolio not found' });
+//     }
+
+//     const stockValues = [];
+
+//     for (const holding of portfolio.holdings) {
+//       const currentPrice = await fetchCurrentPrice(holding.symbol);
+//       const totalValue = holding.quantity * currentPrice;
+
+//       stockValues.push({
+//         symbol: holding.symbol,
+//         quantity: holding.quantity,
+//         current_price: parseFloat(currentPrice.toFixed(2)),
+//         total_value: parseFloat(totalValue.toFixed(2))
+//       });
+//     }
+
+//     res.status(200).json({
+//       portfolio_id: portfolio.portfolio_id,
+//       portfolio_name: portfolio.name,
+//       stocks: stockValues
+//     });
+//   } catch (err) {
+//     console.error('Error fetching stock values:', err);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// };
+
+exports.getPortfolioValuePie = async (req, res) => {
+  const user_id = parseInt(req.params.user_id, 10);
+
+  try {
+    /* ① 先拿到用户与组合 */
+    const user = await UserRepo.findOne({ where: { user_id } });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const portfolios = await PortfolioRepo.find({
+      where: { user: { user_id } },
+      relations: ['holdings'],
+    });
+
+    /* ② 逐个组合计算股票价值明细和组合总价值 */
+    const result = [];
+
+    for (const p of portfolios) {
+      const stocks = [];
+      let totalValue = 0;
+
+      /* ▶ 可选：这里也可以 Promise.all 并发请求加速 */
+      for (const h of p.holdings) {
+        const price = await fetchCurrentPrice(h.symbol);
+        const value = h.quantity * price;
+        totalValue += value;
+
+        stocks.push({
+          symbol: h.symbol,
+          quantity: h.quantity,
+          current_price: Number(price.toFixed(2)),
+          total_value: Number(value.toFixed(2)),
+        });
+      }
+
+      result.push({
+        portfolio_id: p.portfolio_id,
+        portfolio_name: p.name,
+        total_value: Number(totalValue.toFixed(2)),
+        stocks,                              // ✅ 每支股票的明细
+      });
+    }
+
+    /* ③ 返回：余额 + 所有组合（含明细） */
+    res.status(200).json({
+      balance: Number(user.balance),
+      portfolios: result,
+    });
+  } catch (err) {
+    console.error('Pie chart data error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

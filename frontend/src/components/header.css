@@ -1,0 +1,15 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+.header h3 {
+  margin: 10px;
+}
+.header h3:hover {
+  cursor: pointer;
+  color: #d0d0d0;
+}
+
+/*# sourceMappingURL=header.css.map */

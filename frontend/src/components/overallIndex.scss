@@ -1,0 +1,21 @@
+.overallIndex{
+    display: flex;
+    width: 20%;
+    flex-direction: column;
+    margin: 10px 20px 10px 0;
+    border-radius: 10px;
+    background-color: #000000;
+    padding: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid #333;
+    .upper{
+        .title{
+            color: #0073c0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    }
+    hr{
+        color: #27723e;
+    }
+}

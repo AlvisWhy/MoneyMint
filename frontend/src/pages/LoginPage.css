@@ -1,0 +1,65 @@
+.LoginPage {
+  box-sizing: border-box;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.LoginPage .LoginPanel {
+  box-sizing: border-box;
+  width: 30%;
+  height: 80%;
+  position: absolute;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+  border: white 1px solid;
+  background-color: black;
+  box-shadow: 5px 10px 20px rgba(255, 255, 255, 0.55);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 3% 0;
+}
+.LoginPage .LoginPanel .loginInput {
+  box-sizing: border-box;
+  width: 80%;
+  height: 7%;
+  display: flex;
+  margin-left: 10%;
+  margin-right: 10%;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+}
+.LoginPage .LoginPanel .loginInput input {
+  height: 100%;
+  width: 200%;
+}
+.LoginPage .LoginPanel h5 {
+  margin: -5%;
+}
+.LoginPage .LoginPanel .confirmBtn {
+  height: 7%;
+  width: 80%;
+  border: white 1px solid;
+  padding: 5px;
+  background-color: black;
+  color: white;
+  margin-bottom: 10px;
+  font-weight: lighter;
+  font-size: 0.8rem;
+}
+.LoginPage .LoginPanel .confirmBtn:hover {
+  cursor: pointer;
+  background-color: white;
+  color: black;
+}
+.LoginPage .LoginPanel .thirdClassBtn {
+  width: 80%;
+}
+
+/*# sourceMappingURL=LoginPage.css.map */

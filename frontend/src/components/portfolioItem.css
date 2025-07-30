@@ -1,0 +1,13 @@
+.portItem {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.portItem .namepart {
+  width: 15%;
+}
+.portItem .infopart {
+  width: 60%;
+}
+
+/*# sourceMappingURL=portfolioItem.css.map */

@@ -1,0 +1,12 @@
+.portItem{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    .namepart{
+        width: 15%;
+    }
+    .infopart{
+        width: 60%;
+    }
+
+}

@@ -1,0 +1,115 @@
+.portfolios {
+  box-sizing: border-box;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.portfolios h3 {
+  font-weight: lighter;
+}
+.portfolios .header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+.portfolios .header h3 {
+  margin: 10px;
+}
+.portfolios .header h3:hover {
+  cursor: pointer;
+  color: #d0d0d0;
+}
+.portfolios .portfoliosBody {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: start;
+  width: 100%;
+}
+.portfolios .portfoliosBody .part1 {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.portfolios .portfoliosBody .part1 .button {
+  border-radius: 5px;
+  padding: 4px;
+  border: #777777 1px solid;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.portfolios .portfoliosBody .part1 .button:hover {
+  background-color: #3b3b3b;
+  color: #fff;
+}
+.portfolios .portfoliosBody .part2 {
+  width: 100%;
+  border-radius: 5px;
+  padding: 4px;
+  border: #777777 1px solid;
+  height: 30vh;
+}
+.portfolios .portfoliosBody .part2 .diagram {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  gap: 10px;
+}
+.portfolios .portfoliosBody .part3 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.portfolios .portfoliosBody .part3 .portTitle {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.portfolios .portfoliosBody .part3 .portTitle .leftTitle {
+  display: flex;
+}
+.portfolios .portfoliosBody .part3 .portTitle .leftTitle .myPortBtn {
+  border-radius: 5px;
+  padding: 4px;
+  border: #777777 1px solid;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+.portfolios .portfoliosBody .part3 .portTitle .leftTitle .myPortBtn:hover {
+  background-color: #00224b;
+  color: #fff;
+}
+.portfolios .portfoliosBody .part3 .portBody {
+  border: #777777 1px solid;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.portfolios .portfoliosBody .part3 .portBody .infopart {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  width: 60%;
+}
+.portfolios .portfoliosBody .part3 .portBody .infopart .namepart {
+  width: 15%;
+}
+.portfolios .portfoliosBody .part3 .portBody .infopart .infopart {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/*# sourceMappingURL=portfolios.css.map */

@@ -1,0 +1,108 @@
+.stock-item {
+  width: 100%;
+  background-color: #111;
+  color: #fff;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.05);
+}
+.stock-item .stock-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.stock-item .stock-name {
+  width: 20%;
+}
+.stock-item .stock-name strong {
+  font-size: 1.1rem;
+}
+.stock-item .stock-name .ticker {
+  font-size: 0.85rem;
+  color: #888;
+}
+.stock-item .stock-data {
+  flex: 5;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(80px, 1fr));
+  gap: 0.5rem;
+  text-align: center;
+}
+.stock-item .stock-data div {
+  font-size: 0.95rem;
+}
+.stock-item .toggle-btn {
+  flex: 0;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+.stock-item .toggle-btn:hover {
+  color: #0af;
+}
+.stock-item .stock-expanded {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+.stock-item .stock-expanded button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.stock-item .stock-expanded button.buy-btn {
+  background-color: #28a745;
+  color: white;
+}
+.stock-item .stock-expanded button.details-btn {
+  background-color: #007bff;
+  color: white;
+}
+.stock-item .stock-expanded button:hover {
+  opacity: 0.9;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-content {
+  position: relative;
+  background-color: #111;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1000px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.close-btn {
+  z-index: 10000;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 18px;
+  background: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/*# sourceMappingURL=StockItem.css.map */

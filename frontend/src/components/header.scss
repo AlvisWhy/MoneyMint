@@ -1,0 +1,15 @@
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+
+    h3 {
+        margin: 10px;
+
+        &:hover {
+            cursor: pointer;
+            color: #d0d0d0;
+        }
+    }
+}
