@@ -78,22 +78,23 @@ const MainPage = () => {
                     <div className="secTitle">
                         <h3>Stocks</h3>
                     </div>
-                    <div className="allStocks">
-                        <div className="stockTitleRow">
-                            <div className="name">
-                                <span className="name">Company</span>
-                            </div>
-
-                            <span className="price">Price</span>
-                            <span className="change">Change</span>
-                            <span className="percent">%</span>
-                            <span className="open">Open</span>
-                            <span className="high">High</span>
-                            <span className="low">Low</span>
-                            <span className="volume">Volume</span>
-
+                    <div className="stockTitleRow">
+                        <div className="name">
+                            <span className="name">Company</span>
                         </div>
-                        <hr className="stockTitleDivider" />
+
+                        <span className="price">Price</span>
+                        <span className="change">Change</span>
+                        <span className="percent">percentage</span>
+                        <span className="open">Open</span>
+                        <span className="high">High</span>
+                        <span className="low">Low</span>
+                        <span className="volume">Volume</span>
+
+                    </div>
+                    <hr className="stockTitleDivider" />
+                    <div className="allStocks">
+
 
                         {stockList.map(stock => (
                             <StockItem key={stock.ticker} data={stock} />

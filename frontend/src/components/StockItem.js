@@ -3,7 +3,6 @@ import './StockItem.scss';
 import * as echarts from 'echarts';
 
 const StockItem = ({ data }) => {
-    const [expanded, setExpanded] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
     const {
@@ -115,7 +114,7 @@ const StockItem = ({ data }) => {
                             showSymbol: false,
                             lineStyle: {
                                 width: 1.5,
-                                color: '#ffd700' // 金黄色
+                                color: '#ffd700'
                             }
                         },
                         {
@@ -126,7 +125,7 @@ const StockItem = ({ data }) => {
                             showSymbol: false,
                             lineStyle: {
                                 width: 1.5,
-                                color: '#00bfff' // 亮蓝色
+                                color: '#00bfff'
                             }
                         },
                         {
@@ -137,13 +136,12 @@ const StockItem = ({ data }) => {
                             showSymbol: false,
                             lineStyle: {
                                 width: 1.5,
-                                color: '#ff69b4' // 粉紫色
+                                color: '#ff69b4'
                             }
                         }
                     ]
                 });
-            }
-    )
+            })
             .catch(err => {
                 console.error('Error fetching chart data:', err);
             });
@@ -155,7 +153,7 @@ const StockItem = ({ data }) => {
 
     return (
         <>
-            <div className="stock-item">
+            <div className="stock-item" onClick={openModal}>
                 <div className="stock-summary">
                     <div className="stock-name">
                         <strong>{company_name}</strong>
@@ -171,18 +169,7 @@ const StockItem = ({ data }) => {
                         <div>{low.toFixed(2)}</div>
                         <div>{volume.toLocaleString()}</div>
                     </div>
-
-                    <button className="toggle-btn" onClick={() => setExpanded(!expanded)}>
-                        {expanded ? '▲' : '▼'}
-                    </button>
                 </div>
-
-                {expanded && (
-                    <div className="stock-expanded">
-                        <button className="buy-btn">Buy</button>
-                        <button className="details-btn" onClick={openModal}>Show Detail</button>
-                    </div>
-                )}
             </div>
 
             {showModal && (
@@ -190,6 +177,10 @@ const StockItem = ({ data }) => {
                     <div className="modal-content">
                         <button className="close-btn" onClick={closeModal}>✕</button>
                         <div id="kline-chart" style={{ width: '100%', height: '500px' }}></div>
+                        <div className="modal-actions">
+                            <button className="portfolio-btn">Add to Existing Portfolio</button>
+                            <button className="portfolio-btn">Create and Add to a New Portfolio</button>
+                        </div>
                     </div>
                 </div>
             )}

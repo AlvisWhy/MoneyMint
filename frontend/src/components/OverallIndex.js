@@ -10,9 +10,9 @@ const OverallIndex = ({ title, sp, val, perVal }) => {
             <hr
                 style={{
                     border: 'none',
-                    borderTop: '1px dashed white',
+                    borderTop: '1px dashed #a2a2a2',
                     width: '100%',
-                    margin: '1rem 0',
+                    margin: '5px 0',
                     color: '#27723e',
                 }}
             />
