@@ -187,8 +187,8 @@ exports.createCheckoutSession = async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: 'http://www.baidu.com',
-      cancel_url: 'http://www.bing.com',
+      success_url: 'http://localhost:3000/portfolios',
+      cancel_url: 'http://localhost:3000/portfolios',
     });
 
     res.json({ url: session.url,
