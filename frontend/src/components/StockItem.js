@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './StockItem.scss';
 import * as echarts from 'echarts';
+import { useSelector } from 'react-redux';
 
 const StockItem = ({ data }) => {
     const [showModal, setShowModal] = useState(false);
-
+    const [selectedPortfolio, setSelectedPortfolio] = useState(null);
+    const [quantity, setQuantity] = useState('');
+    const chartRef = useRef(null);
+    const chartInstance = useRef(null);
+    const state = useSelector(state => state);
+    console.log('redux state:', state);
+    const userId = useSelector(state => state.userData.user.id);
+    const portfolios = useSelector(state => state.userData.portfolioData);
+    console.log(userId)
     const {
         ticker,
         company_name,
@@ -22,19 +31,42 @@ const StockItem = ({ data }) => {
     const openModal = () => setShowModal(true);
     const closeModal = () => setShowModal(false);
 
+    const handleBuy = async () => {
+        if (!selectedPortfolio || !quantity) return;
+
+        const payload = {
+            portfolio_id: parseInt(selectedPortfolio),
+            symbol: ticker,
+            quantity: parseInt(quantity),
+            price: parseFloat(current_price)
+        };
+
+        try {
+            const res = await fetch('https://backend-1383.onrender.com/api/trade/buy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+            console.log('Buy success:', result);
+
+            // 弹窗 + 关闭
+            alert('Purchase completed!');
+            closeModal(); // 👈 成功后关闭模态框
+        } catch (err) {
+            console.error('Buy error:', err);
+            alert('Purchase failed.');
+        }
+    };
+
     useEffect(() => {
-        if (!showModal) return;
-
-        const chartDom = document.getElementById('kline-chart');
-        if (!chartDom) return;
-        const myChart = echarts.init(chartDom);
-
-        const upColor = '#00da3c';
-        const downColor = '#ec0000';
+        if (!showModal || !chartRef.current) return;
 
         fetch(`https://moneymint.onrender.com/get-chart-data?ticker=${ticker}`)
             .then(res => res.json())
-            .then(rawData => {
+            .then(data => {
+                const rawData = data.chart_data;
                 const categoryData = [];
                 const values = [];
 
@@ -53,7 +85,7 @@ const StockItem = ({ data }) => {
                         }
                         let sum = 0;
                         for (let j = 0; j < dayCount; j++) {
-                            sum += values[i - j][1]; // 收盘价
+                            sum += values[i - j][1];
                         }
                         result.push((sum / dayCount).toFixed(2));
                     }
@@ -64,25 +96,37 @@ const StockItem = ({ data }) => {
                 const ma10 = calculateMA(10);
                 const ma20 = calculateMA(20);
 
-                myChart.setOption({
+                if (chartInstance.current) chartInstance.current.dispose();
+                chartInstance.current = echarts.init(chartRef.current);
+
+                chartInstance.current.setOption({
                     backgroundColor: '#000',
                     animation: false,
+                    title: {
+                        text: `${company_name} (${ticker})`,
+                        left: 'center',
+                        top: 4,
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 16
+                        }
+                    },
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: { type: 'cross' },
                         backgroundColor: '#222',
                         borderColor: '#aaa',
                         borderWidth: 1,
-                        textStyle: {
-                            color: '#fff',
-                            fontSize: 12
-                        },
+                        textStyle: { color: '#fff', fontSize: 12 },
                         padding: 10,
                     },
                     legend: {
-                        data: ['K线', 'MA5', 'MA10', 'MA20'],
-                        textStyle: { color: '#ccc' }
+                        data: ['MA5', 'MA10', 'MA20'],
+                        textStyle: { color: '#ccc' },
+                        top: 40,
+                        left: 'center'
                     },
+                    grid: { left: '10%', right: '10%', bottom: '15%' },
                     xAxis: {
                         type: 'category',
                         data: categoryData,
@@ -93,7 +137,6 @@ const StockItem = ({ data }) => {
                         axisLine: { lineStyle: { color: '#888' } },
                         splitLine: { lineStyle: { color: '#444' } },
                     },
-                    grid: { left: '10%', right: '10%', bottom: '15%' },
                     series: [
                         {
                             name: 'K线',
@@ -112,10 +155,7 @@ const StockItem = ({ data }) => {
                             data: ma5,
                             smooth: true,
                             showSymbol: false,
-                            lineStyle: {
-                                width: 1.5,
-                                color: '#ffd700'
-                            }
+                            lineStyle: { width: 1.5, color: '#ffd700' }
                         },
                         {
                             name: 'MA10',
@@ -123,10 +163,7 @@ const StockItem = ({ data }) => {
                             data: ma10,
                             smooth: true,
                             showSymbol: false,
-                            lineStyle: {
-                                width: 1.5,
-                                color: '#00bfff'
-                            }
+                            lineStyle: { width: 1.5, color: '#00bfff' }
                         },
                         {
                             name: 'MA20',
@@ -134,22 +171,17 @@ const StockItem = ({ data }) => {
                             data: ma20,
                             smooth: true,
                             showSymbol: false,
-                            lineStyle: {
-                                width: 1.5,
-                                color: '#ff69b4'
-                            }
+                            lineStyle: { width: 1.5, color: '#ff69b4' }
                         }
                     ]
                 });
             })
-            .catch(err => {
-                console.error('Error fetching chart data:', err);
-            });
+            .catch(err => console.error('Error fetching chart data:', err));
 
         return () => {
-            myChart.dispose();
+            if (chartInstance.current) chartInstance.current.dispose();
         };
-    }, [showModal, ticker]);
+    }, [showModal, ticker, company_name]);
 
     return (
         <>
@@ -159,7 +191,6 @@ const StockItem = ({ data }) => {
                         <strong>{company_name}</strong>
                         <div className="ticker">{ticker}</div>
                     </div>
-
                     <div className="stock-data">
                         <div>{current_price.toFixed(2)}</div>
                         <div style={{ color }}>{change_amount.toFixed(2)}</div>
@@ -176,10 +207,39 @@ const StockItem = ({ data }) => {
                 <div className="modal-overlay">
                     <div className="modal-content">
                         <button className="close-btn" onClick={closeModal}>✕</button>
-                        <div id="kline-chart" style={{ width: '100%', height: '500px' }}></div>
+                        <div ref={chartRef} style={{ width: '100%', height: '500px' }} />
                         <div className="modal-actions">
-                            <button className="portfolio-btn">Add to Existing Portfolio</button>
-                            <button className="portfolio-btn">Create and Add to a New Portfolio</button>
+                            <input
+                                type="number"
+                                placeholder="Input Qty to Buy"
+                                value={quantity}
+                                onChange={(e) => setQuantity(e.target.value)}
+                            />
+
+                            {userId ? (
+                                portfolios.length > 0 ? (
+                                    <>
+                                        <select
+                                            value={selectedPortfolio || ''}
+                                            onChange={(e) => setSelectedPortfolio(e.target.value)}
+                                        >
+                                            <option value="" disabled>Select Portfolio</option>
+                                            {portfolios.map(p => (
+                                                <option key={p.portfolio_id} value={p.portfolio_id}>
+                                                    {p.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <button className="portfolio-btn" onClick={handleBuy}>
+                                            Buy
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div className="info-text">Please Create a Portfolio</div>
+                                )
+                            ) : (
+                                <div className="info-text">Please log in</div>
+                            )}
                         </div>
                     </div>
                 </div>

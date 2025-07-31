@@ -1,15 +1,21 @@
 import LanguageChange from "../components/LanguageChange";
 import './MainPage.scss';
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import OverallIndex from "../components/OverallIndex";
 import StockItem from "../components/StockItem";
 import SearchIcon from '@mui/icons-material/Search';
+import Header from "../components/Header";
 
 const MainPage = () => {
     const nav = useNavigate();
     const [marketData, setMarketData] = useState({});
     const [stockList, setStockList] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [searchText, setSearchText] = useState("");
+
+    const observer = useRef();
 
     // 获取市场指数
     useEffect(() => {
@@ -19,13 +25,40 @@ const MainPage = () => {
             .catch(err => console.error("Error fetching market data:", err));
     }, []);
 
-    // 获取随机股票列表
+    // 初始加载股票数据
     useEffect(() => {
+        loadMoreStocks();
+    }, []);
+
+    const loadMoreStocks = () => {
+        if (loading || !hasMore) return;
+        setLoading(true);
+
         fetch('https://moneymint.onrender.com/random-stocks')
             .then(res => res.json())
-            .then(data => setStockList(data))
-            .catch(err => console.error("Error fetching stock list:", err));
-    }, []);
+            .then(data => {
+                if (data.length === 0) {
+                    setHasMore(false);
+                } else {
+                    setStockList(prev => [...prev, ...data]);
+                }
+            })
+            .catch(err => console.error("Error fetching stock list:", err))
+            .finally(() => setLoading(false));
+    };
+
+    const lastStockRef = useCallback(node => {
+        if (loading) return;
+        if (observer.current) observer.current.disconnect();
+
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                loadMoreStocks();
+            }
+        });
+
+        if (node) observer.current.observe(node);
+    }, [loading, hasMore]);
 
     const renderIndex = (key, title) => {
         const data = marketData[key];
@@ -45,19 +78,46 @@ const MainPage = () => {
         );
     };
 
+    const handleSearch = async () => {
+        const query = searchText.trim().toUpperCase();
+        if (!query) return alert("Please input stock ticker");
+
+        try {
+            const res = await fetch('https://moneymint.onrender.com/get-multi-stock-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tickers: [query] })
+            });
+
+            if (!res.ok) throw new Error("Request failed");
+            const data = await res.json();
+
+            if (!data || data.length === 0 || !data[0].ticker) {
+                alert("Please input right name");
+                return;
+            }
+
+            // 添加到 stockList 的最前面
+            setStockList(prev => [data[0], ...prev]);
+            setSearchText(""); // 清空输入
+        } catch (error) {
+            console.error("Search error:", error);
+            alert("Please input right name");
+        }
+    };
+
     return (
         <div className='mainPage'>
-            <div className='header'>
-                <h3>USER</h3>
-                <h3>CONTACT</h3>
-                <h3 onClick={() => nav('/portfolios')}>PORTFOLIO</h3>
-                <h3 onClick={() => nav('/login')}>LOG IN</h3>
-            </div>
-
+            <Header />
             <div className='mainPageBody'>
                 <div className="searchStock">
-                    <input placeholder="Search For a Stock" />
-                    <div className="searchBtn">
+                    <input
+                        placeholder="Search For a Stock"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+                    />
+                    <div className="searchBtn" onClick={handleSearch}>
                         <SearchIcon />
                     </div>
                 </div>
@@ -82,29 +142,32 @@ const MainPage = () => {
                         <div className="name">
                             <span className="name">Company</span>
                         </div>
-
                         <span className="price">Price</span>
                         <span className="change">Change</span>
-                        <span className="percent">  Percentage</span>
+                        <span className="percent">Percentage</span>
                         <span className="open">Open</span>
                         <span className="high">High</span>
                         <span className="low">Low</span>
                         <span className="volume">Volume</span>
-
                     </div>
                     <hr className="stockTitleDivider" />
                     <div className="allStocks">
+                        {stockList.map((stock, index) => {
+                            if (index === stockList.length - 1) {
+                                return <div ref={lastStockRef} key={stock.ticker}>
+                                    <StockItem data={stock} />
+                                </div>;
+                            }
+                            return <StockItem key={stock.ticker} data={stock} />;
+                        })}
 
-
-                        {stockList.map(stock => (
-                            <StockItem key={stock.ticker} data={stock} />
-                        ))}
+                        {loading && (
+                            <div className="loading-text" style={{ textAlign: 'center', padding: '1rem', color: '#888' }}>
+                                Loading<span className="loading-dots"></span>
+                            </div>
+                        )}
                     </div>
                 </div>
-            </div>
-
-            <div className="mainPageFooter">
-                <LanguageChange />
             </div>
         </div>
     );

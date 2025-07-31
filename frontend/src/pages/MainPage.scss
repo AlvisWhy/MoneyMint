@@ -4,30 +4,16 @@
     color: white;
     display: flex;
     flex-direction: column;
+    justify-content: start;
     height: 100vh;
     h3 {
         font-weight: lighter;
     }
 
-    .header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-end;
-
-        h3 {
-            margin: 2px 10px;
-            &:hover {
-                cursor: pointer;
-                color: #d0d0d0;
-            }
-        }
-    }
-
     .mainPageBody {
         margin: 2px 10px;
         display: flex;
-        height: 90vh;
+        height: 89vh;
         overflow-y: hidden;
         flex-direction: column;
         align-items: start;
@@ -36,7 +22,9 @@
             width: 100%;
             display: flex;
             flex-direction: row;
+            justify-content: start;
             align-items: center;
+            flex-wrap: nowrap;
             input{
                 width: 50%;
                 padding: 4px;
@@ -78,10 +66,12 @@
         }
         .mainPageStocks{
             width: 100%;
+            height: 50vh;
             margin-top: 20px;
+            margin-bottom: 10px;
             .secTitle {
                 box-sizing: border-box;
-                background-color: #111; // 深色背景
+                background-color: #111;
                 border-radius: 4px;
                 padding: 2px 10px;
                 margin-bottom: 15px;
@@ -96,7 +86,7 @@
                 margin-top: 10px;
                 padding-right: 20px;
                 flex: 1;
-                height: 80vh;
+                height: 42vh;
                 overflow-y: auto;
 
                 /* 自定义滚动条样式（适用于 Webkit 浏览器） */
@@ -163,4 +153,28 @@
     border-top: 1px solid white;
     margin: 0;
     width: 100%;
+}
+@keyframes dots {
+    0% { content: "."; }
+    33% { content: ".."; }
+    66% { content: "..."; }
+}
+
+.loading-text::after {
+    display: inline-block;
+    text-align: left;
+    content: "";
+    animation: dot-flash 1.2s steps(3, end) infinite;
+}
+
+@keyframes dot-flash {
+    0% { content: ""; }
+    33% { content: "."; }
+    66% { content: ".."; }
+    100% { content: "..."; }
+}
+
+.loading-dots::after {
+    content: "";
+    animation: dot-flash 1.2s steps(4, end) infinite;
 }

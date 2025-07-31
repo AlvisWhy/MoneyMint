@@ -50,6 +50,20 @@
   background-color: #222;
   color: #fff;
 }
+.portfolios .portfoliosBody .part1 .buttonR {
+  border-radius: 5px;
+  padding: 4px 10px;
+  border: #777777 1px solid;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  background-color: #111;
+  color: #ff0000;
+}
+.portfolios .portfoliosBody .part1 .buttonR:hover {
+  background-color: #222;
+  color: #fff;
+}
 .portfolios .portfoliosBody .part2 {
   width: 100%;
   border-radius: 5px;
@@ -81,17 +95,10 @@
   display: flex;
 }
 .portfolios .portfoliosBody .part3 .portTitle .leftTitle .myPortBtn {
-  border-radius: 5px;
   padding: 4px 10px;
-  border: #777777 1px solid;
-  cursor: pointer;
   background-color: #111;
   color: #00aaff;
   margin-right: 10px;
-}
-.portfolios .portfoliosBody .part3 .portTitle .leftTitle .myPortBtn:hover {
-  background-color: #00224b;
-  color: #fff;
 }
 .portfolios .portfoliosBody .part3 .portBody {
   margin-top: 10px;
@@ -100,6 +107,22 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: 42vh;
+  overflow-y: scroll;
+}
+.portfolios .portfoliosBody .part3 .portBody::-webkit-scrollbar {
+  width: 6px;
+}
+.portfolios .portfoliosBody .part3 .portBody::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+.portfolios .portfoliosBody .part3 .portBody::-webkit-scrollbar-thumb {
+  background-color: #444;
+  border-radius: 3px;
+}
+.portfolios .portfoliosBody .part3 .portBody::-webkit-scrollbar-thumb:hover {
+  background-color: #666;
 }
 .portfolios .portfoliosBody .part3 .portBody .headerRow {
   display: flex;
@@ -120,7 +143,6 @@
 .portfolios .portfoliosBody .part3 .portBody .portfolioItem {
   border: 1px solid #333;
   border-radius: 5px;
-  overflow: hidden;
   background-color: #111;
 }
 .portfolios .portfoliosBody .part3 .portBody .portfolioItem .portfolioHeader {

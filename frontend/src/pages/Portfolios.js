@@ -3,27 +3,146 @@ import PieChart from "../components/PieChart";
 import "./portfolios.scss";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import { Slider, Button } from "@mui/material";
+import { Slider, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
+import { useSelector } from "react-redux";
 
 const Portfolios = () => {
     const nav = useNavigate();
+    const storePortfolioData = useSelector((state) => state.userData.portfolioData);
+    const userId = useSelector((state) => state.userData.user.id);
 
-    // 初始化 rawData 为空对象
     const [rawData, setRawData] = useState({ balance: 0, portfolios: [] });
 
-    // 模拟接口调用，首次加载时请求数据
-    useEffect(() => {
-        fetch("https://backend-1383.onrender.com/api/pieData/totalRatio/1")
-            .then((res) => res.json())
-            .then((data) => {
-                setRawData(data);
-            })
-            .catch((err) => {
-                console.error("Failed to load portfolios:", err);
-            });
-    }, []);
+    // 充值弹窗相关
+    const [chargingOpen, setChargingOpen] = useState(false);
+    const [chargeAmount, setChargeAmount] = useState("");
 
-    // 使用 useMemo 缓存图表数据，保证 rawData.portfolios 已存在且是数组
+    // 创建新组合弹窗相关
+    const [createOpen, setCreateOpen] = useState(false);
+    const [newPortfolioName, setNewPortfolioName] = useState("");
+
+    const openChargeModal = () => setChargingOpen(true);
+    const closeChargeModal = () => {
+        setChargingOpen(false);
+        setChargeAmount("");
+    };
+
+    const openCreateModal = () => setCreateOpen(true);
+    const closeCreateModal = () => {
+        setCreateOpen(false);
+        setNewPortfolioName("");
+    };
+
+    // 充值确认
+    const handleChargeConfirm = async () => {
+        const amount = parseFloat(chargeAmount);
+        if (!userId) {
+            alert("User not logged in.");
+            return;
+        }
+        if (isNaN(amount) || amount <= 0) {
+            alert("Please input valid amount.");
+            return;
+        }
+
+        try {
+            const res = await fetch("https://backend-1383.onrender.com/api/trade/charge", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: userId,
+                    amount: amount
+                })
+            });
+
+            if (!res.ok) throw new Error("Charge failed");
+
+            const data = await res.json();
+
+            alert("Charge successful!");
+            closeChargeModal();
+
+            if (data.url) {
+                window.location.href = data.url;  // 浏览器跳转到新的URL
+                // 或者 window.location.assign(data.url);
+            }
+        } catch (err) {
+            console.error("Charge error:", err);
+            alert("Failed to charge account.");
+        }
+    };
+
+
+    // 创建组合确认
+    const handleCreateConfirm = async () => {
+        const name = newPortfolioName.trim();
+        if (!userId) {
+            alert("User not logged in.");
+            return;
+        }
+        if (!name) {
+            alert("Please input a portfolio name.");
+            return;
+        }
+
+        try {
+            const res = await fetch("https://backend-1383.onrender.com/api/portfolios/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: userId,
+                    name: name
+                })
+            });
+
+            if (!res.ok) throw new Error("Create portfolio failed");
+
+            const createdPortfolio = await res.json();
+            alert("Portfolio created successfully!");
+            closeCreateModal();
+
+            // 如果需要，重新加载数据或更新状态
+            // 这里可以添加刷新redux或重新fetch的逻辑
+
+        } catch (err) {
+            console.error("Create portfolio error:", err);
+            alert("Failed to create portfolio.");
+        }
+    };
+
+    useEffect(() => {
+        if (storePortfolioData && Array.isArray(storePortfolioData) && storePortfolioData.length > 0) {
+            const calculated = storePortfolioData.map((p) => {
+                const total_value = p.holdings.reduce(
+                    (sum, h) => sum + h.current_price * h.quantity,
+                    0
+                );
+                return {
+                    portfolio_id: p.portfolio_id,
+                    portfolio_name: p.name,
+                    total_value,
+                    stocks: p.holdings.map((h) => ({
+                        symbol: h.symbol,
+                        quantity: h.quantity,
+                        current_price: h.current_price,
+                        total_value: h.current_price * h.quantity
+                    }))
+                };
+            });
+
+            const invested = calculated.reduce((sum, p) => sum + p.total_value, 0);
+            setRawData({
+                balance: 2000000 - invested,
+                portfolios: calculated
+            });
+        } else {
+            fetch("https://backend-1383.onrender.com/api/pieData/totalRatio/1")
+                .then((res) => res.json())
+                .then((data) => setRawData(data))
+                .catch((err) => console.error("Failed to load portfolios:", err));
+        }
+    }, [storePortfolioData]);
+
     const invested = useMemo(() => {
         if (!rawData || !Array.isArray(rawData.portfolios)) return 0;
         return rawData.portfolios.reduce((sum, p) => sum + p.total_value, 0);
@@ -33,7 +152,7 @@ const Portfolios = () => {
         if (!rawData || !Array.isArray(rawData.portfolios)) return [];
         return [
             { value: rawData.balance || 0, name: "Cash Balance" },
-            { value: invested, name: "Invested Assets" },
+            { value: invested, name: "Invested Assets" }
         ];
     }, [rawData, invested]);
 
@@ -41,7 +160,7 @@ const Portfolios = () => {
         if (!rawData || !Array.isArray(rawData.portfolios)) return [];
         return rawData.portfolios.map((p) => ({
             value: p.total_value,
-            name: p.portfolio_name,
+            name: p.portfolio_name
         }));
     }, [rawData]);
 
@@ -55,52 +174,51 @@ const Portfolios = () => {
         });
         return Object.entries(stockTotals).map(([symbol, value]) => ({
             value,
-            name: symbol,
+            name: symbol
         }));
     }, [rawData]);
 
-    // 状态管理
     const [expanded, setExpanded] = useState({});
     const [sliders, setSliders] = useState({});
 
     const toggleExpand = (portfolioId) => {
         setExpanded((prev) => ({
             ...prev,
-            [portfolioId]: !prev[portfolioId],
+            [portfolioId]: !prev[portfolioId]
         }));
     };
 
     const handleSliderChange = (portfolioId, symbol, value) => {
         setSliders((prev) => ({
             ...prev,
-            [`${portfolioId}-${symbol}`]: value,
+            [`${portfolioId}-${symbol}`]: value
         }));
     };
 
     const handleConfirm = (portfolioId, symbol) => {
         const val = sliders[`${portfolioId}-${symbol}`];
         console.log(`Confirmed: Portfolio ${portfolioId}, Stock ${symbol}, New Quantity: ${val}`);
-        // TODO: 实际操作，比如调用API更新数据
+        // TODO: 调用API同步数量更改
     };
-
-    if (!rawData || !Array.isArray(rawData.portfolios)) {
-        return <div>Loading portfolios...</div>; // 加载状态
-    }
 
     return (
         <div className="portfolios">
             <Header />
             <div className="portfoliosBody">
                 <div className="part1">
-                    <div className="button">Overview of All portfolios</div>
-                    <div className="button">Create New Portfolio</div>
+                    <div className="buttonR" onClick={openChargeModal}>Charging</div>
+                    <div className="button" onClick={openCreateModal}>Create New Portfolio</div>
                 </div>
 
                 <div className="part2">
                     <div className="diagram">
                         <PieChart title="Balance vs Invested" data={chart1} />
-                        <PieChart title="Investment by Portfolio" data={chart2} />
-                        <PieChart title="Investment by Stock" data={chart3} />
+                        {rawData.portfolios.length > 0 && (
+                            <>
+                                <PieChart title="Investment by Portfolio" data={chart2} />
+                                <PieChart title="Investment by Stock" data={chart3} />
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -108,7 +226,6 @@ const Portfolios = () => {
                     <div className="portTitle">
                         <div className="leftTitle">
                             <div className="myPortBtn">My Portfolios</div>
-                            <div className="myPortBtn">My Holdings</div>
                         </div>
                         <div className="rightTitle">How to Utilize My Portfolio and My Holdings</div>
                     </div>
@@ -123,11 +240,25 @@ const Portfolios = () => {
 
                         {rawData.portfolios.map((portfolio) => (
                             <div className="portfolioItem" key={portfolio.portfolio_id}>
-                                <div className="portfolioHeader" onClick={() => toggleExpand(portfolio.portfolio_id)}>
-                                    <h4>{portfolio.portfolio_name}</h4>
+                                <div
+                                    className="portfolioHeader"
+                                    onClick={() => toggleExpand(portfolio.portfolio_id)}
+                                >
+                                    <h4
+                                        onClick={() => {
+                                            nav(`/portdetail/${portfolio.portfolio_id}`);
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        {portfolio.portfolio_name}
+                                    </h4>
                                     <div className="rightele">
-                                        <div className="totalValue">${portfolio.total_value.toLocaleString()}</div>
-                                        <div className="toggleBtn">{expanded[portfolio.portfolio_id] ? "▲" : "▼"}</div>
+                                        <div className="totalValue">
+                                            ${portfolio.total_value.toLocaleString()}
+                                        </div>
+                                        <div className="toggleBtn">
+                                            {expanded[portfolio.portfolio_id] ? "▲" : "▼"}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -137,25 +268,8 @@ const Portfolios = () => {
                                             <div className="stockRow" key={stock.symbol}>
                                                 <div className="symbol">{stock.symbol}</div>
                                                 <div className="symbolRight">
-                                                    <div className="value">${stock.total_value.toLocaleString()}</div>
-                                                    <div className="sliderControl">
-                                                        <Slider
-                                                            value={sliders[`${portfolio.portfolio_id}-${stock.symbol}`] ?? stock.quantity}
-                                                            min={0}
-                                                            max={stock.quantity * 2}
-                                                            step={100}
-                                                            onChange={(e, newValue) => handleSliderChange(portfolio.portfolio_id, stock.symbol, newValue)}
-                                                            size="small"
-                                                            sx={{ color: "#00aaff", width: 150 }}
-                                                        />
-                                                        <Button
-                                                            variant="outlined"
-                                                            size="small"
-                                                            onClick={() => handleConfirm(portfolio.portfolio_id, stock.symbol)}
-                                                            sx={{ marginLeft: 1, color: "#00aaff", borderColor: "#00aaff" }}
-                                                        >
-                                                            Confirm
-                                                        </Button>
+                                                    <div className="value">
+                                                        ${stock.total_value.toLocaleString()}
                                                     </div>
                                                 </div>
                                             </div>
@@ -167,6 +281,52 @@ const Portfolios = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Charging 弹窗 */}
+            <Dialog open={chargingOpen} onClose={closeChargeModal}>
+                <DialogTitle style={{ background: "#222", color: "#fff" }}>Charge Balance</DialogTitle>
+                <DialogContent style={{ background: "#111" }}>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Enter Amount"
+                        fullWidth
+                        variant="outlined"
+                        value={chargeAmount}
+                        onChange={(e) => setChargeAmount(e.target.value)}
+                        inputProps={{ style: { color: "#fff" } }}
+                        InputLabelProps={{ style: { color: "#ccc" } }}
+                        sx={{ input: { background: "#222" } }}
+                    />
+                </DialogContent>
+                <DialogActions style={{ background: "#111" }}>
+                    <Button onClick={closeChargeModal} sx={{ color: "#ccc" }}>Cancel</Button>
+                    <Button onClick={handleChargeConfirm} sx={{ color: "#00aaff" }}>Confirm</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* 创建新组合弹窗 */}
+            <Dialog open={createOpen} onClose={closeCreateModal}>
+                <DialogTitle style={{ background: "#222", color: "#fff" }}>Create New Portfolio</DialogTitle>
+                <DialogContent style={{ background: "#111" }}>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Portfolio Name"
+                        fullWidth
+                        variant="outlined"
+                        value={newPortfolioName}
+                        onChange={(e) => setNewPortfolioName(e.target.value)}
+                        inputProps={{ style: { color: "#fff" } }}
+                        InputLabelProps={{ style: { color: "#ccc" } }}
+                        sx={{ input: { background: "#222" } }}
+                    />
+                </DialogContent>
+                <DialogActions style={{ background: "#111" }}>
+                    <Button onClick={closeCreateModal} sx={{ color: "#ccc" }}>Cancel</Button>
+                    <Button onClick={handleCreateConfirm} sx={{ color: "#00aaff" }}>Confirm</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

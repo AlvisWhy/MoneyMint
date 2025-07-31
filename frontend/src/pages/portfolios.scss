@@ -54,6 +54,21 @@
                     color: #fff;
                 }
             }
+            .buttonR {
+                border-radius: 5px;
+                padding: 4px 10px;
+                border: #777777 1px solid;
+                cursor: pointer;
+                margin-top: 10px;
+                margin-bottom: 20px;
+                background-color: #111;
+                color: #ff0000;
+
+                &:hover {
+                    background-color: #222;
+                    color: #fff;
+                }
+            }
         }
 
         .part2 {
@@ -89,18 +104,13 @@
                     display: flex;
 
                     .myPortBtn {
-                        border-radius: 5px;
                         padding: 4px 10px;
-                        border: #777777 1px solid;
-                        cursor: pointer;
+
                         background-color: #111;
                         color: #00aaff;
                         margin-right: 10px;
 
-                        &:hover {
-                            background-color: #00224b;
-                            color: #fff;
-                        }
+
                     }
                 }
             }
@@ -112,7 +122,25 @@
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+                height: 42vh;
+                overflow-y: scroll;
+                &::-webkit-scrollbar {
+                    width: 6px; // 滚动条宽度
+                }
 
+                &::-webkit-scrollbar-track {
+                    background: #1a1a1a; // 滚动轨道颜色（深灰）
+                    border-radius: 3px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background-color: #444; // 拖动块颜色（灰）
+                    border-radius: 3px;
+                }
+
+                &::-webkit-scrollbar-thumb:hover {
+                    background-color: #666; // 悬停颜色
+                }
                 .headerRow {
                     display: flex;
                     justify-content: space-between;
@@ -134,7 +162,6 @@
                 .portfolioItem {
                     border: 1px solid #333;
                     border-radius: 5px;
-                    overflow: hidden;
                     background-color: #111;
 
                     .portfolioHeader {

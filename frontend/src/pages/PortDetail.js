@@ -2,23 +2,28 @@ import React, { useEffect, useState } from "react";
 import * as echarts from "echarts";
 import "./PortDetail.scss";
 import Header from "../components/Header";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const PortDetail = ({ portName }) => {
+const PortDetail = () => {
+    const { portid } = useParams();
+    const nav = useNavigate();
+    const portfolioDataFromStore = useSelector(state => state.userData.portfolioData);
     const [portfolioData, setPortfolioData] = useState([]);
+    const [currentPortfolio, setCurrentPortfolio] = useState(null);
+    const [stocks, setStocks] = useState([]);
 
-    // === 计算函数 ===
+    // 计算指标函数略（不变）
+
     function calculateReturnPercent(initialValue, currentValue) {
         return ((currentValue - initialValue) / initialValue) * 100;
     }
-
     function calculateAnnualizedReturn(initialValue, currentValue) {
         return (Math.pow(currentValue / initialValue, 1 / (100 / 365)) - 1) * 100;
     }
-
     function calculateExcessReturn(portfolioReturn) {
         return portfolioReturn - 4.39;
     }
-
     function calculateSharpeRatio(portfolioReturns) {
         const excessReturns = portfolioReturns.map(r => r - 4.39);
         const avg = excessReturns.reduce((sum, r) => sum + r, 0) / excessReturns.length;
@@ -27,7 +32,6 @@ const PortDetail = ({ portName }) => {
         );
         return stdDev === 0 ? 0 : avg / stdDev;
     }
-
     function calculateMaxDrawdown(values) {
         let peak = values[0];
         let maxDrawdown = 0;
@@ -38,7 +42,6 @@ const PortDetail = ({ portName }) => {
         }
         return maxDrawdown * 100;
     }
-
     function calculateBeta(portfolioReturns, benchmarkReturns) {
         const n = portfolioReturns.length;
         const avgPortfolio = portfolioReturns.reduce((a, b) => a + b, 0) / n;
@@ -51,7 +54,6 @@ const PortDetail = ({ portName }) => {
         }
         return variance === 0 ? 0 : covariance / variance;
     }
-
     function calculateAlpha(portfolioReturns, benchmarkReturns) {
         const beta = calculateBeta(portfolioReturns, benchmarkReturns);
         const avgPortfolio = portfolioReturns.reduce((a, b) => a + b, 0) / portfolioReturns.length;
@@ -59,60 +61,48 @@ const PortDetail = ({ portName }) => {
         return avgPortfolio - (4.39 + beta * (avgBenchmark - 4.39));
     }
 
-    // 股票假数据
-    const fakeStockData = [
-        {
-            ticker: "GE",
-            company_name: "GE Aerospace",
-            current_price: 270.31,
-            change_amount: -0.48,
-            change_percent: -0.18,
-            open: 272.73,
-            high: 273.80,
-            low: 269.12,
-            volume: 4092200,
-        },
-        {
-            ticker: "PNC",
-            company_name: "The PNC Financial Services Group, Inc.",
-            current_price: 193.37,
-            change_amount: 0.07,
-            change_percent: 0.04,
-            open: 195.23,
-            high: 195.51,
-            low: 192.87,
-            volume: 1236600,
-        },
-        {
-            ticker: "MSFT",
-            company_name: "Microsoft Corporation",
-            current_price: 512.57,
-            change_amount: -1.19,
-            change_percent: -0.23,
-            open: 515.53,
-            high: 517.62,
-            low: 511.56,
-            volume: 16444700,
-        },
-    ];
+    // 获取当前投资组合
+    useEffect(() => {
+        if (portfolioDataFromStore && portid) {
+            const portfolio = portfolioDataFromStore.find(p => p.portfolio_id.toString() === portid.toString());
+            setCurrentPortfolio(portfolio || null);
+            if (portfolio) {
+                const formattedStocks = portfolio.holdings.map(h => ({
+                    ticker: h.symbol,
+                    company_name: h.company_name || h.symbol,
+                    current_price: h.current_price,
+                    change_amount: h.change_amount || 0,
+                    change_percent: h.change_percent || 0,
+                    open: h.open || 0,
+                    high: h.high || 0,
+                    low: h.low || 0,
+                    volume: h.volume || 0,
+                    quantity: h.quantity || 0,
+                }));
+                setStocks(formattedStocks);
+            } else {
+                setStocks([]);
+            }
+        }
+    }, [portfolioDataFromStore, portid]);
 
-    // === 模拟数据 + 图表 ===
+    // 模拟收益率数据
     const generatePortfolioData = () => {
         const values = [];
         let cumulative = 1.0;
         for (let i = 0; i < 100; i++) {
-            const dailyReturn = (Math.random() - 0.5) * 0.2; // -10% ~ +10%
+            const dailyReturn = (Math.random() - 0.5) * 0.2;
             cumulative *= 1 + dailyReturn;
             values.push(parseFloat((cumulative - 1).toFixed(4)));
         }
         return values;
     };
 
+    // 生成图表
     useEffect(() => {
         const data = generatePortfolioData();
         setPortfolioData(data);
 
-        // 折线图初始化
         const chartDom = document.getElementById("main");
         if (!chartDom) return;
         const myChart = echarts.init(chartDom);
@@ -170,14 +160,11 @@ const PortDetail = ({ portName }) => {
 
         myChart.setOption(option);
 
-        // ========== 第二个图表：指标柱状图 ==========
-        const initialValue = 1;
+        // Summary chart
         const finalValue = data[data.length - 1] + 1;
         const mockBenchmark = data.map(p => p * 0.8);
-
-        // 先计算所有指标变量（必须先定义，避免“cannot access before initialization”）
-        const returnPct = calculateReturnPercent(initialValue, finalValue);
-        const annualized = calculateAnnualizedReturn(initialValue, finalValue);
+        const returnPct = calculateReturnPercent(1, finalValue);
+        const annualized = calculateAnnualizedReturn(1, finalValue);
         const excess = calculateExcessReturn(returnPct);
         const sharpe = calculateSharpeRatio(data.map(v => v * 100));
         const drawdown = calculateMaxDrawdown(data.map(v => v + 1));
@@ -187,8 +174,7 @@ const PortDetail = ({ portName }) => {
         const summaryDom = document.getElementById("summaryChart");
         if (summaryDom) {
             const summaryChart = echarts.init(summaryDom);
-
-            const summaryOption = {
+            summaryChart.setOption({
                 backgroundColor: "#000",
                 tooltip: { trigger: "item" },
                 xAxis: {
@@ -209,36 +195,44 @@ const PortDetail = ({ portName }) => {
                             annualized,
                             excess,
                             sharpe,
-                            -drawdown, // 负向展示
+                            -drawdown,
                             alpha,
                             beta,
                         ],
                         type: "bar",
                         barWidth: "50%",
                         itemStyle: {
-                            color: function(params) {
-                                return params.data >= 0 ? "#3399ff" : "#ff4c4c"; // 亮蓝正，亮红负
+                            color: function (params) {
+                                return params.data >= 0 ? "#3399ff" : "#ff4c4c";
                             }
                         }
                     }
                 ],
-            };
-
-            summaryChart.setOption(summaryOption);
+            });
         }
 
-        return () => {
-            myChart.dispose();
-        };
-    }, []);
+        return () => myChart.dispose();
+    }, [portid]);
+
+    // 🔁 跳转到下一个 portfolio
+    const handleNext = () => {
+        if (!portfolioDataFromStore || !currentPortfolio) return;
+
+        const currentIndex = portfolioDataFromStore.findIndex(p => p.portfolio_id.toString() === portid.toString());
+        if (currentIndex !== -1 && currentIndex < portfolioDataFromStore.length - 1) {
+            const nextPortfolio = portfolioDataFromStore[currentIndex + 1];
+            nav(`/portdetail/${nextPortfolio.portfolio_id}`);
+        }
+    };
 
     return (
         <div className="portDetailPage">
             <Header />
             <div className="portPart1">
                 <div className="portName">
-                    <h3>{'Current Portfolio'}</h3>
+                    <h3>{currentPortfolio ? currentPortfolio.name : `Portfolio ID: ${portid}`}</h3>
                 </div>
+                <div className="btn" onClick={handleNext} style={{ cursor: "pointer" }}>{">"}</div>
             </div>
 
             <div className="portPart2">
@@ -250,27 +244,33 @@ const PortDetail = ({ portName }) => {
             <div className="portPart3">
                 <div className="basicData">
                     <div className="smlTitle">Basic Data</div>
-                    {fakeStockData.map((stock) => (
-                        <div key={stock.ticker} className="stock-row">
-                            <div className="stock-info">
-                                <div className="ticker">{stock.ticker}</div>
-                                <div className="company">{stock.company_name}</div>
-                                <div className="price">${stock.current_price.toFixed(2)}</div>
-                                <div className="volume">{stock.volume.toLocaleString()}</div>
+                    {stocks.length > 0 ? (
+                        stocks.map((stock) => (
+                            <div key={stock.ticker} className="stock-row">
+                                <div className="stock-info">
+                                    <div className="ticker">{stock.ticker}</div>
+                                    <div className="company">{stock.company_name}</div>
+                                    <div className="price">${stock.current_price.toFixed(2)}</div>
+                                    <div className="volume">{stock.volume.toLocaleString()}</div>
+                                </div>
+                                <div className="stock-actions">
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        placeholder="Qty"
+                                        className="quantity-input"
+                                        defaultValue={stock.quantity}
+                                    />
+                                    <button className="action-btn buy">+</button>
+                                    <button className="action-btn sell">−</button>
+                                </div>
                             </div>
-                            <div className="stock-actions">
-                                <input
-                                    type="number"
-                                    min="1"
-                                    placeholder="Qty"
-                                    className="quantity-input"
-                                />
-                                <button className="action-btn buy">+</button>
-                                <button className="action-btn sell">−</button>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <div>No stock data available for this portfolio.</div>
+                    )}
                 </div>
+
                 <div className="summary">
                     <div className="smlTitle">Summary</div>
                     <div

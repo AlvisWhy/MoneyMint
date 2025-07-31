@@ -14,7 +14,7 @@ function App() {
                 <Route path='/login' element={<LoginPage/>}/>
                 <Route path='/portfolios' element={<Portfolios/>}/>
                 <Route path='/test' element={<TestComponent/>}/>
-                <Route path='/portdetail' element={<PortDetail/>}/>
+                <Route path='/portdetail/:portid' element={<PortDetail/>}/>
             </Routes>
         </BrowserRouter>
     );
